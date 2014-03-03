@@ -4,14 +4,14 @@
 
 namespace sst {
 
-int write_sst(Enumerator<std::pair<std::string, std::string>>* kv, const char* fpath) {
+int write_sst(Enumerator<std::pair<std::string, std::string>>& kv, const char* fpath) {
    Writer* w = new Writer(fpath);
    int err = w->get_error();
    if (err != 0) {
        goto out;
    }
-   while (*kv) {
-       err = w->write_pair(kv->next());
+   while (kv) {
+       err = w->write_pair(kv.next());
        if (err != 0) {
            goto out;
        }

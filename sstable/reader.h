@@ -11,9 +11,15 @@
 
 namespace sst {
 
-class Reader: public Enumerator<std::pair<std::string, std::string>> {
+class Reader: public NoCopy, public Enumerator<std::pair<std::string, std::string>> {
 public:
     Reader(const char* fpath);
+    ~Reader() {
+        if (fp_) {
+            fclose(fp_);
+            fp_ = nullptr;
+        }
+    }
     bool has_next() const {
         if (cached_) {
             return true;
@@ -30,14 +36,6 @@ public:
         }
         cached_ = false;
         return next_;
-    }
-protected:
-    // protected dtor for RefCounted
-    ~Reader() {
-        if (fp_) {
-            fclose(fp_);
-            fp_ = nullptr;
-        }
     }
 private:
     bool prefetch_next() const;

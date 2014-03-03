@@ -10,7 +10,7 @@
 
 namespace sst {
 
-class Writer {
+class Writer: public NoCopy {
 public:
     Writer(const char* fpath);
     ~Writer() {
@@ -50,6 +50,6 @@ out:
     return err;
 }
 
-int write_sst(Enumerator<std::pair<std::string, std::string>>* kv, const char* fpath);
+int write_sst(Enumerator<std::pair<std::string, std::string>>& kv, const char* fpath);
 
 } // namespace sst

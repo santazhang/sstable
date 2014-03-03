@@ -51,7 +51,7 @@ bool Reader::prefetch_next() const {
             next_.first.resize(key_len);
             fread(&next_.first[0], 1, key_len, fp_);
         }
-        
+
         if (Flags::empty_value(flag)) {
             next_.second.resize(0);
         } else {

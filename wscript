@@ -16,6 +16,9 @@ def configure(conf):
 
 def build(bld):
     bld.stlib(source=bld.path.ant_glob("sstable/*.cc"), target="sst", includes="sstable", use="BASE PTHREAD")
+    bld.program(source="sst_utils/sst_compact.cc", target="sst_compact", includes=".", use="sst BASE PTHREAD")
+    bld.program(source="sst_utils/sst_dump.cc", target="sst_dump", includes=".", use="sst BASE PTHREAD")
+    bld.program(source="sst_utils/sst_merge.cc", target="sst_merge", includes=".", use="sst BASE PTHREAD")
     bld.program(source=bld.path.ant_glob("test/test*.cc"), target="unittest", includes=".", use="sst BASE PTHREAD")
 
 #
