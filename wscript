@@ -15,8 +15,8 @@ def configure(conf):
     conf.env.LIB_BASE = 'base'
 
 def build(bld):
-    bld.stlib(source=bld.path.ant_glob("sstable/*.cc"), target="sstable", includes="sstable", use="BASE PTHREAD")
-    bld.program(source=bld.path.ant_glob("test/test*.cc"), target="testharness", includes=".", use="sstable BASE PTHREAD")
+    bld.stlib(source=bld.path.ant_glob("sstable/*.cc"), target="sst", includes="sstable", use="BASE PTHREAD")
+    bld.program(source=bld.path.ant_glob("test/test*.cc"), target="unittest", includes=".", use="sst BASE PTHREAD")
 
 #
 # waf helper code
