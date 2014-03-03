@@ -38,7 +38,7 @@ bool Reader::prefetch_next() const {
         }
         int bsize = SparseInt::buf_size(sbuf[0]);
         if (bsize > 1) {
-            if (fread(sbuf + 1, 1, bsize - 1, fp_) != bsize - 1) {
+            if ((int) fread(sbuf + 1, 1, bsize - 1, fp_) != bsize - 1) {
                 goto err_out;
             }
         }
@@ -49,7 +49,9 @@ bool Reader::prefetch_next() const {
             fseek(fp_, key_len, SEEK_CUR);
         } else {
             next_.first.resize(key_len);
-            fread(&next_.first[0], 1, key_len, fp_);
+            if ((int) fread(&next_.first[0], 1, key_len, fp_) != key_len) {
+                goto err_out;
+            }
         }
 
         if (Flags::empty_value(flag)) {
@@ -62,7 +64,7 @@ bool Reader::prefetch_next() const {
             }
             bsize = SparseInt::buf_size(sbuf[0]);
             if (bsize > 1) {
-                if (fread(sbuf + 1, 1, bsize - 1, fp_) != bsize - 1) {
+                if ((int) fread(sbuf + 1, 1, bsize - 1, fp_) != bsize - 1) {
                     goto err_out;
                 }
             }
@@ -73,7 +75,9 @@ bool Reader::prefetch_next() const {
                 fseek(fp_, val_len, SEEK_CUR);
             } else {
                 next_.second.resize(val_len);
-                fread(&next_.second[0], 1, val_len, fp_);
+                if ((int) fread(&next_.second[0], 1, val_len, fp_) != val_len) {
+                    goto err_out;
+                }
             }
         }
 

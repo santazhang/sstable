@@ -62,7 +62,7 @@ int Writer::write_pair(const std::pair<std::string, std::string>& pair, i32 flag
     char sbuf[9];
     int bsize = SparseInt::dump((i32) key.size(), sbuf);
     errno = 0;
-    if (fwrite(sbuf, 1, bsize, fp_) != bsize) {
+    if ((int) fwrite(sbuf, 1, bsize, fp_) != bsize) {
         return errno;
     }
     errno = 0;
@@ -72,7 +72,7 @@ int Writer::write_pair(const std::pair<std::string, std::string>& pair, i32 flag
     if (!Flags::empty_value(flag)) {
         bsize = SparseInt::dump((i32) value.size(), sbuf);
         errno = 0;
-        if (fwrite(sbuf, 1, bsize, fp_) != bsize) {
+        if ((int) fwrite(sbuf, 1, bsize, fp_) != bsize) {
             return errno;
         }
         errno = 0;
