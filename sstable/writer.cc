@@ -21,7 +21,7 @@ out:
    return err;
 }
 
-Writer::Writer(const char* fpath): err_(0) {
+Writer::Writer(const char* fpath): err_(0), first_(false) {
     errno = 0;
     fp_ = fopen(fpath, "wb");
     if (fp_ == nullptr) {

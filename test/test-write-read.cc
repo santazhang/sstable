@@ -28,6 +28,7 @@ TEST(sst, write_then_read) {
         Log::debug("%s -> %s", p.first.c_str(), p.second.c_str());
     }
     EXPECT_EQ(r->get_error(), 0);
+    delete r;
 }
 
 TEST(sst, manual_write_then_read) {
@@ -59,4 +60,5 @@ TEST(sst, manual_write_then_read) {
         Log::debug("%s -> %s", p.first.c_str(), p.second.c_str());
     }
     EXPECT_EQ(r->get_error(), 0);
+    delete r;
 }
