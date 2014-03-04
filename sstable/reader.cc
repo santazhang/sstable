@@ -8,7 +8,7 @@ Reader::Reader(const char* fpath): err_(0), cached_(false) {
     fp_ = fopen(fpath, "rb");
     if (fp_ == nullptr) {
         err_ = errno;
-        Log::error("cannot open file: %s, error=%d: %s", fpath, errno, strerror(errno));
+        Log::error("cannot open file: %s, error=%d: %s", fpath, err_, strerror(err_));
         return;
     }
 
@@ -31,19 +31,20 @@ bool Reader::prefetch_next() const {
     i32 flag = 0;
     for (;;) {
         errno = 0;
+        long before_pos = ftell(fp_);
         if (fread(&flag, sizeof(flag), 1, fp_) != 1) {
-            if (feof(fp_)) {
+            long after_pos = ftell(fp_);
+            if (before_pos == after_pos) {
                 return false;
-            } else {
-                goto err_out;
             }
+            goto err_out;
         }
 
         // read key size varint
         char sbuf[9];
         errno = 0;
         sbuf[0] = fgetc(fp_);
-        if (errno != 0) {
+        if (errno != 0 || feof(fp_)) {
             goto err_out;
         }
         int bsize = SparseInt::buf_size(sbuf[0]);
@@ -56,7 +57,14 @@ bool Reader::prefetch_next() const {
 
         if (Flags::deleted(flag)) {
             // ignore key
-            fseek(fp_, key_len, SEEK_CUR);
+            long old_pos = ftell(fp_);
+            if (fseek(fp_, key_len, SEEK_CUR) != 0) {
+                goto err_out;
+            }
+            long new_pos = ftell(fp_);
+            if (new_pos - old_pos != key_len) {
+                goto err_out;
+            }
         } else {
             next_.first.resize(key_len);
             if ((int) fread(&next_.first[0], 1, key_len, fp_) != key_len) {
@@ -69,7 +77,7 @@ bool Reader::prefetch_next() const {
         } else {
             errno = 0;
             sbuf[0] = fgetc(fp_);
-            if (errno != 0) {
+            if (errno != 0 || feof(fp_)) {
                 goto err_out;
             }
             bsize = SparseInt::buf_size(sbuf[0]);
@@ -82,7 +90,14 @@ bool Reader::prefetch_next() const {
 
             if (Flags::deleted(flag)) {
                 // ignore value
-                fseek(fp_, val_len, SEEK_CUR);
+                long old_pos = ftell(fp_);
+                if (fseek(fp_, val_len, SEEK_CUR) != 0) {
+                    goto err_out;
+                }
+                long new_pos = ftell(fp_);
+                if (new_pos - old_pos != val_len) {
+                    goto err_out;
+                }
             } else {
                 next_.second.resize(val_len);
                 if ((int) fread(&next_.second[0], 1, val_len, fp_) != val_len) {

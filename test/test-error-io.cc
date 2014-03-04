@@ -14,7 +14,7 @@ using namespace std;
 using namespace sst;
 
 TEST(error_io, print_errnos) {
-    int errnos[] = {1, 2, 13};
+    int errnos[] = {1, 2, 5, 13};
     for (int i = 0; i < arraysize(errnos); i++) {
         Log::info("errno(%d): %s", errnos[i], strerror(errnos[i]));
     }
@@ -98,6 +98,7 @@ TEST(error_io, read_from_cropped_file) {
     struct stat st;
     verify(stat("cropped_file.sst", &st) == 0);
     Log::debug("original file size: %d", st.st_size);
+    int error_cnt = 0;
     for (int fsz = st.st_size; fsz >= 0; fsz--) {
         Log::debug("cropped file size to %d", fsz);
         truncate("cropped_file.sst", fsz);
@@ -109,9 +110,10 @@ TEST(error_io, read_from_cropped_file) {
         if (r.get_error() != 0) {
             Log::debug("error = %d: %s", r.get_error(), strerror(r.get_error()));
         }
-        if (fsz == st.st_size - 1) {
-            EXPECT_NEQ(r.get_error(), 0);
+        if (r.get_error() != 0) {
+            error_cnt++;
         }
     }
+    EXPECT_GT(error_cnt, 100);
     unlink("cropped_file.sst");
 }

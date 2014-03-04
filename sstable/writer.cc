@@ -32,6 +32,9 @@ Writer::Writer(const char* fpath): err_(0), first_(false) {
         i32 magic = Flags::magic;
         if (fwrite(&magic, sizeof(magic), 1, fp_) != 1) {
             err_ = errno;
+            if (err_ != 0) {
+                err_ = EIO;
+            }
         }
     }
 }
@@ -55,32 +58,42 @@ int Writer::write_pair(const std::pair<std::string, std::string>& pair, i32 flag
             assert(Flags::empty_value(flag));
         }
     }
-    errno = 0;
-    if (fwrite(&flag, sizeof(flag), 1, fp_) != 1) {
-        return errno;
-    }
+
     char sbuf[9];
     int bsize = SparseInt::dump((i32) key.size(), sbuf);
+
+    errno = 0;
+    if (fwrite(&flag, sizeof(flag), 1, fp_) != 1) {
+        goto err_out;
+    }
+
     errno = 0;
     if ((int) fwrite(sbuf, 1, bsize, fp_) != bsize) {
-        return errno;
+        goto err_out;
     }
     errno = 0;
     if (fwrite(&key[0], 1, key.size(), fp_) != key.size()) {
-        return errno;
+        goto err_out;
     }
     if (!Flags::empty_value(flag)) {
         bsize = SparseInt::dump((i32) value.size(), sbuf);
         errno = 0;
         if ((int) fwrite(sbuf, 1, bsize, fp_) != bsize) {
-            return errno;
+            goto err_out;
         }
         errno = 0;
         if (fwrite(&value[0], 1, value.size(), fp_) != value.size()) {
-            return errno;
+            goto err_out;
         }
     }
     return 0;
+
+err_out:
+    err_ = errno;
+    if (err_ == 0) {
+        err_ = EIO;
+    }
+    return err_;
 }
 
 } // namespace sst
