@@ -7,8 +7,8 @@ Reader::Reader(const char* fpath): err_(0), cached_(false) {
     errno = 0;
     fp_ = fopen(fpath, "rb");
     if (fp_ == nullptr) {
-        Log::error("cannot open file: %s", fpath);
         err_ = errno;
+        Log::error("cannot open file: %s, error=%d: %s", fpath, errno, strerror(errno));
         return;
     }
 
@@ -22,11 +22,21 @@ Reader::Reader(const char* fpath): err_(0), cached_(false) {
 }
 
 bool Reader::prefetch_next() const {
+    verify(cached_ == false);
+
+    if (fp_ == nullptr) {
+        return false;
+    }
+
     i32 flag = 0;
     for (;;) {
         errno = 0;
         if (fread(&flag, sizeof(flag), 1, fp_) != 1) {
-            goto err_out;
+            if (feof(fp_)) {
+                return false;
+            } else {
+                goto err_out;
+            }
         }
 
         // read key size varint
@@ -89,8 +99,9 @@ bool Reader::prefetch_next() const {
     return true;
 
 err_out:
-    if (!feof(fp_)) {
-        err_ = errno;
+    err_ = errno;
+    if (err_ == 0) {
+        err_ = EIO;
     }
     return false;
 }
