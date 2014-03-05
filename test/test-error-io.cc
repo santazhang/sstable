@@ -15,7 +15,7 @@ using namespace sst;
 
 TEST(error_io, print_errnos) {
     int errnos[] = {1, 2, 5, 13};
-    for (int i = 0; i < arraysize(errnos); i++) {
+    for (size_t i = 0; i < arraysize(errnos); i++) {
         Log::info("errno(%d): %s", errnos[i], strerror(errnos[i]));
     }
 }
@@ -56,9 +56,9 @@ TEST(error_io, write_not_possible) {
 
 TEST(error_io, magic_not_match) {
     const char* wrong_magic = "BLAH";
-    for (int fsize = 4; fsize >= 0; fsize--) {
+    for (long fsize = 4; fsize >= 0; fsize--) {
         FILE* fp = fopen("magic_not_match.sst", "wb");
-        verify(fwrite(wrong_magic, 1, fsize, fp) == fsize);
+        verify(fwrite(wrong_magic, 1, fsize, fp) == (size_t) fsize);
         verify(fp != nullptr);
         fclose(fp);
 

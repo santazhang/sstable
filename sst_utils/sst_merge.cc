@@ -12,7 +12,7 @@ struct merge_helper {
     Reader* src;
 
     merge_helper() {}
-    merge_helper(const pair<string, string>& data, Reader* src): data(data), src(src) {}
+    merge_helper(const pair<string, string>& pair, Reader* r): data(pair), src(r) {}
 };
 
 inline bool operator < (const struct merge_helper& a, const struct merge_helper& b) {

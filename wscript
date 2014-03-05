@@ -9,6 +9,7 @@ def configure(conf):
     _enable_pic(conf)
     _enable_cxx11(conf)
     _enable_debug(conf)
+    _extra_warnings(conf)
     conf.env.LIB_PTHREAD = 'pthread'
     conf.env.INCLUDES_BASE = os.path.join(os.getcwd(), "../base-utils")
     conf.env.LIBPATH_BASE = os.path.join(os.getcwd(), "../base-utils/build")
@@ -50,3 +51,6 @@ def _enable_debug(conf):
         conf.env.append_value("CXXFLAGS", "-Wall -pthread -ggdb".split())
     else:
         conf.env.append_value("CXXFLAGS", "-Wall -pthread -O3 -ggdb -fno-omit-frame-pointer -DNDEBUG".split())
+
+def _extra_warnings(conf):
+    conf.env.append_value("CXXFLAGS", "-Wextra -Wpedantic -Wformat=2 -Wno-unused-parameter -Wshadow -Wwrite-strings -Wstrict-prototypes -Wold-style-definition -Wredundant-decls -Wnested-externs -Wmissing-include-dirs -Wno-gnu -Wno-format-nonliteral".split())
