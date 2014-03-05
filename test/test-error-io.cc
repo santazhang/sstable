@@ -102,7 +102,7 @@ TEST(error_io, read_from_cropped_file) {
     struct stat st;
     verify(stat("cropped_file.sst", &st) == 0);
     Log::debug("original file size: %d", st.st_size);
-    int error_cnt = 0;
+    int last_error = -1;
     for (int fsz = st.st_size; fsz >= 0; fsz--) {
         Log::debug("cropped file size to %d", fsz);
         EXPECT_EQ(truncate("cropped_file.sst", fsz), 0);
@@ -111,13 +111,13 @@ TEST(error_io, read_from_cropped_file) {
             pair<string, string> p = r.next();
             Log::debug("%s => %s", p.first.c_str(), p.second.c_str());
         }
+        if (last_error == 0) {
+            EXPECT_NEQ(r.get_error(), 0);
+        }
+        last_error = r.get_error();
         if (r.get_error() != 0) {
             Log::debug("error = %d: %s", r.get_error(), strerror(r.get_error()));
         }
-        if (r.get_error() != 0) {
-            error_cnt++;
-        }
     }
-    EXPECT_GT(error_cnt, 100);
     unlink("cropped_file.sst");
 }

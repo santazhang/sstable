@@ -42,6 +42,7 @@ private:
 
     FILE* fp_;
     int err_;
+    off_t fsize_;
 
     bool cached_;
     std::pair<std::string, std::string> next_;

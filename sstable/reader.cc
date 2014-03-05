@@ -1,9 +1,13 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "flags.h"
 #include "reader.h"
 
 namespace sst {
 
-Reader::Reader(const char* fpath): err_(0), cached_(false) {
+Reader::Reader(const char* fpath): err_(0), fsize_(0), cached_(false) {
     errno = 0;
     fp_ = fopen(fpath, "rb");
     if (fp_ == nullptr) {
@@ -11,6 +15,10 @@ Reader::Reader(const char* fpath): err_(0), cached_(false) {
         Log::error("cannot open file: %s, error=%d: %s", fpath, err_, strerror(err_));
         return;
     }
+
+    struct stat st;
+    verify(fstat(fileno(fp_), &st) == 0);
+    fsize_ = st.st_size;
 
     i32 magic = 0;
     if (fread(&magic, sizeof(magic), 1, fp_) != 1 || magic != Flags::magic) {
@@ -32,6 +40,9 @@ bool Reader::prefetch_next() {
     for (;;) {
         errno = 0;
         long before_pos = ftell(fp_);
+        if (before_pos > fsize_) {
+            goto err_out;
+        }
         if (fread(&flag, sizeof(flag), 1, fp_) != 1) {
             long after_pos = ftell(fp_);
             if (before_pos == after_pos) {
