@@ -13,11 +13,7 @@ namespace sst {
 class Writer: public NoCopy {
 public:
     Writer(const char* fpath);
-    ~Writer() {
-        if (fp_) {
-            fclose(fp_);
-        }
-    }
+    ~Writer();
     int get_error() const {
         return err_;
     }

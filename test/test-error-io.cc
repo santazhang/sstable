@@ -95,13 +95,17 @@ static void write_dummy_data(const char* fn) {
 
 TEST(error_io, read_from_cropped_file) {
     write_dummy_data("cropped_file.sst");
+
+    // enable write access because we need to truncate file later
+    EXPECT_EQ(chmod("cropped_file.sst", 0644), 0);
+
     struct stat st;
     verify(stat("cropped_file.sst", &st) == 0);
     Log::debug("original file size: %d", st.st_size);
     int error_cnt = 0;
     for (int fsz = st.st_size; fsz >= 0; fsz--) {
         Log::debug("cropped file size to %d", fsz);
-        truncate("cropped_file.sst", fsz);
+        EXPECT_EQ(truncate("cropped_file.sst", fsz), 0);
         Reader r("cropped_file.sst");
         while (r.has_next()) {
             pair<string, string> p = r.next();

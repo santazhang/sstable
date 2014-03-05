@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "utils.h"
 #include "flags.h"
 #include "writer.h"
@@ -39,7 +42,19 @@ Writer::Writer(const char* fpath): err_(0), first_(false) {
     }
 }
 
+Writer::~Writer() {
+   if (fp_) {
+       // make file read only
+       fchmod(fileno(fp_), 0444);
+       fclose(fp_);
+   }
+}
+
 int Writer::write_pair(const std::pair<std::string, std::string>& pair, i32 flag /* =? */) {
+    if (fp_ == nullptr) {
+        return EBADF;
+    }
+
     // check ordering
     if (first_) {
         first_ = false;

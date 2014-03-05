@@ -1,6 +1,9 @@
 #include <map>
 #include <string>
 
+#include <unistd.h>
+#include <errno.h>
+
 #include "base/all.h"
 #include "sstable/flags.h"
 #include "sstable/reader.h"
@@ -28,6 +31,7 @@ TEST(sst, write_then_read) {
         Log::debug("%s -> %s", p.first.c_str(), p.second.c_str());
     }
     EXPECT_EQ(r->get_error(), 0);
+    unlink("test.sst");
     delete r;
 }
 
@@ -66,5 +70,16 @@ TEST(sst, manual_write_then_read) {
     }
     EXPECT_EQ(r->get_error(), 0);
     EXPECT_EQ(record_cnt, read_cnt);
+    unlink("test.sst");
     delete r;
+}
+
+TEST(sst, no_overwrite) {
+    Writer* w = new Writer("no_overwrite.sst");
+    EXPECT_EQ(w->get_error(), 0);
+    delete w;
+    w = new Writer("no_overwrite.sst");
+    EXPECT_EQ(w->get_error(), EACCES);
+    delete w;
+    unlink("no_overwrite.sst");
 }
