@@ -6,8 +6,8 @@ template<class T>
 class Enumerator {
 public:
     virtual ~Enumerator() {}
-    virtual bool has_next() const = 0;
-    operator bool() const {
+    virtual bool has_next() = 0;
+    operator bool() {
         return this->has_next();
     }
     virtual T next() = 0;

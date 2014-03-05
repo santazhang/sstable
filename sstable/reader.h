@@ -20,7 +20,7 @@ public:
             fp_ = nullptr;
         }
     }
-    bool has_next() const {
+    bool has_next() {
         if (cached_) {
             return true;
         } else {
@@ -38,13 +38,13 @@ public:
         return next_;
     }
 private:
-    bool prefetch_next() const;
+    bool prefetch_next();
 
     FILE* fp_;
-    mutable int err_;
+    int err_;
 
-    mutable bool cached_;
-    mutable std::pair<std::string, std::string> next_;
+    bool cached_;
+    std::pair<std::string, std::string> next_;
 };
 
 } // namespace sst

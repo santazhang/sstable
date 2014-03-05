@@ -21,7 +21,7 @@ Reader::Reader(const char* fpath): err_(0), cached_(false) {
     }
 }
 
-bool Reader::prefetch_next() const {
+bool Reader::prefetch_next() {
     verify(cached_ == false);
 
     if (fp_ == nullptr) {

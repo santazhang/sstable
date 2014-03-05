@@ -11,7 +11,7 @@ using namespace sst;
 class IntRange: public Enumerator<int> {
 public:
     IntRange(int last): cur_(0), last_(last) { }
-    bool has_next() const {
+    bool has_next() {
         return cur_ < last_;
     }
     int next() {
