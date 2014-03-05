@@ -7,7 +7,6 @@
 #include <errno.h>
 
 #include "utils.h"
-#include "enumerator.h"
 
 namespace sst {
 

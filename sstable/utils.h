@@ -9,5 +9,6 @@ using base::i64;
 using base::SparseInt;
 using base::NoCopy;
 using base::Log;
+using base::Enumerator;
 
 }
