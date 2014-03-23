@@ -10,5 +10,7 @@ using base::SparseInt;
 using base::NoCopy;
 using base::Log;
 using base::Enumerator;
+using base::MergedEnumerator;
+using base::insert_into_map;
 
 }
